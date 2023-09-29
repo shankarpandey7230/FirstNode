@@ -1,29 +1,24 @@
 const express = require("express");
 const app = express();
-const morgan = require("morgan");
-const logger = require("./logger");
-const authorize = require("./authorize");
-//  req => middleware => res
+let { people } = require("./data");
 
-// app.use([logger, authorize])
-// app.use(express.static('./public'))
-app.use(morgan("tiny"));
+//static assets
 
-app.get("/", (req, res) => {
-  res.send("Home");
+app.use(express.static("./methods-public"));
+// parse form data
+app.use(express.urlencoded({ extended: false }));
+app.get("/api/people", (req, res) => {
+  res.status(200).json({ success: true, data: people });
 });
 
-app.get("/about", (req, res) => {
-  res.send("About");
+app.post("/login", (req, res) => {
+  // console.log(req.body);
+  const { name } = req.body;
+  if (name) {
+    return res.status(200).send(`Welcome ${name}`);
+  }
+  res.status(401).send("Please Provide credentials");
 });
-app.get("/api/products", (req, res) => {
-  res.send("Products");
-});
-app.get("/api/items", (req, res) => {
-  console.log(req.user);
-  res.send("Items");
-});
-
 app.listen(3000, () => {
-  console.log("Server is listening on port 3000....");
+  console.log("Server is listening on port 3000..");
 });
